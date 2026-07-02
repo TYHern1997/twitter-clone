@@ -1,18 +1,20 @@
-import AuthPage from "./pages/AuthPage";
-import ProfilePage from "./pages/ProfilePage"
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { PostsProvider } from "./context/PostsContext";
+import AuthPage from "./pages/AuthPage";
+import ProfilePage from "./pages/ProfilePage";
+import { AuthProvider } from "./components/AuthProvider"
 
 export default function App() {
   return (
-    <PostsProvider>
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/profile" element={<ProfilePage />}></Route>
-          <Route path="/login" element={<AuthPage />}></Route>
-          <Route path="*" element={<AuthPage />}></Route>
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="*" element={<AuthPage />} />
         </Routes>
       </BrowserRouter>
-    </PostsProvider>
-  )
+    </AuthProvider>
+
+
+  );
 }

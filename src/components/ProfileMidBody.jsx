@@ -1,42 +1,26 @@
-import { Button, Col, Image, Nav, Row, Spinner } from "react-bootstrap";
-import ProfilePostCard from "./ProfilePostCard";
-import { jwtDecode } from "jwt-decode";
-import { useEffect } from "react";
-import { usePosts } from "../context/PostsContext";
+import { useContext, useEffect } from 'react';
+import { Button, Col, Image, Nav, Row, Spinner } from 'react-bootstrap';
+import ProfilePostCard from './ProfilePostCard';
+import { AuthContext } from './AuthProvider';
 
 export default function ProfileMidBody() {
-    // const [posts, setPosts] = useState([])
-    const url = "https://pbs.twimg.com/profile_banners/83072625/1602845571/1500x500";
-    const pic = "https://pbs.twimg.com/profile_images/1587405892437221376/h167Jlb2_400x400.jpg";
+    const url =
+        'https://pbs.twimg.com/profile_banners/83072625/1602845571/1500x500';
+    const pic =
+        'https://pbs.twimg.com/profile_images/1587405892437221376/h167Jlb2_400x400.jpg';
 
-    // const fetchPosts = (userId) => {
-    //     fetch(
-    //         `http://localhost:3000/posts/user/${userId}`
-    //     )
-    //         .then((response) => response.json())
-    //         .then((data) => setPosts(data))
-    //         .catch((error) => console.error("Error:", error))
-    // };
-
-    const { posts, loading, fetchPostsByUser } = usePosts();
+    const { currentUser, posts, postsLoading, fetchPostsByUser } = useContext(AuthContext);
 
     useEffect(() => {
-        const fetchPosts = async () => {
-            const token = localStorage.getItem("authToken");
-            if (token) {
-                const decodedToken = jwtDecode(token);
-                const userId = decodedToken.id
-                await fetchPostsByUser(userId)
-            }
+        if (currentUser) {
+            fetchPostsByUser(currentUser.uid);
         }
-        fetchPosts();
-    }, [])
+    }, [fetchPostsByUser, currentUser]);
 
     return (
         <Col sm={6} className="bg-light" style={{ border: "1px solid lightgrey" }}>
             <Image src={url} fluid />
             <br />
-
             <Image
                 src={pic}
                 roundedCircle
@@ -58,17 +42,17 @@ export default function ProfileMidBody() {
             </Row>
 
             <p className="mt-5" style={{ margin: 0, fontWeight: "bold", fontSize: "15px" }}>
-                Elijah
+                Haris
             </p>
 
-            <p style={{ marginBottom: "2px" }}>@elijah</p>
+            <p style={{ marginBottom: "2px" }}>@haris.samingan</p>
 
-            <p> I help people switch careers to be a software developre at sigmaschool.co</p>
+            <p>I help people switch careers to be a software developer at sigmaschool.co</p>
 
-            <p>Entreprenuer</p>
+            <p>Entrepreneur</p>
 
             <p>
-                <strong>271</strong> Folowwing <strong>610</strong> Followers
+                <strong>271</strong> Following <strong>610</strong> Followers
             </p>
 
             <Nav variant="underline" defaultActiveKey="/home" justify>
@@ -76,27 +60,24 @@ export default function ProfileMidBody() {
                     <Nav.Link eventKey="/home">Tweets</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                    <Nav.Link eventKey="/link-1">Replies</Nav.Link>
+                    <Nav.Link eventKey="link-1">Replies</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                    <Nav.Link eventKey="/link-2">Highlights</Nav.Link>
+                    <Nav.Link eventKey="link-2">Highlights</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                    <Nav.Link eventKey="/link-3">Media</Nav.Link>
+                    <Nav.Link eventKey="link-3">Media</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                    <Nav.Link eventKey="/link-4">Likes</Nav.Link>
+                    <Nav.Link eventKey="link-4">Likes</Nav.Link>
                 </Nav.Item>
             </Nav>
-            {loading && (
+            {postsLoading && (
                 <Spinner animation="border" className="ms-3 mt-3" variant="primary" />
             )}
             {posts.length > 0 && posts.map((post) => (
-                <ProfilePostCard key={post.id} content={post.content} postId={post.id} />
-
+                <ProfilePostCard key={post.id} post={post} />
             ))}
-
-
         </Col>
-    )
+    );
 }

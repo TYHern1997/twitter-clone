@@ -1,45 +1,25 @@
-
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
-import { usePosts } from "../context/PostsContext";
-
+import { AuthContext } from './AuthProvider'
 
 export default function NewPostModal({ show, handleClose }) {
-    const [postContent, setPostContent] = useState("");
+    const [postContent, setPostContent] = useState('');
+    const [file, setFile] = useState(null)
+    const { currentUser, savePost } = useContext(AuthContext);
+    const userId = currentUser?.uid;
 
-    const { savePost } = usePosts()
-
-    const handleSave = async () => {
-
-        await savePost(postContent);
-
-        handleClose();
-        setPostContent('')
+    const handleSave = () => {
+        if (userId) {
+            savePost(userId, postContent, file);
+            handleClose();
+            setPostContent('');
+            setFile(null);
+        }
     };
-    // const token = localStorage.getItem("authToken");
 
-    // //Decode the token to fetch user id
-    // const decode = jwtDecode(token);
-    // const userId = decode.id; // May change depending on how the server encode the token
-
-    // //Prepare data to be sent
-    // const data = {
-    //     title: "Post Title",  //Add functionality to set this properly
-    //     content: postContent,
-    //     user_id: userId,
-    // };
-
-    // //Make your API call here
-    // axios
-    //     .post("http://localhost:3000/posts", data)
-    //     .then((response) => {
-    //         console.log("Success:", response.data);
-    //         handleClose();
-    //     })
-    //     .catch((error) => {
-    //         console.error("Error", error);
-    //     });
-
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
+    }
 
     return (
         <>
@@ -52,8 +32,10 @@ export default function NewPostModal({ show, handleClose }) {
                                 placeholder="What is happening?!"
                                 as="textarea"
                                 rows={3}
+                                value={postContent}
                                 onChange={(e) => setPostContent(e.target.value)}
                             />
+                            <Form.Control type="file" onChange={handleFileChange} />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
@@ -68,5 +50,5 @@ export default function NewPostModal({ show, handleClose }) {
                 </Modal.Footer>
             </Modal>
         </>
-    )
+    );
 }

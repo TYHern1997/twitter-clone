@@ -1,23 +1,31 @@
+import { useContext, useEffect } from "react";
 import { Container, Row } from "react-bootstrap";
-import { useEffect } from "react"
 import { useNavigate } from "react-router-dom";
-import { useLocalStorage } from "usehooks-ts";
+import { getAuth, signOut } from "firebase/auth";
 import ProfileSideBar from "../components/ProfileSideBar";
 import ProfileMidBody from "../components/ProfileMidBody";
+import { AuthContext } from "../components/AuthProvider";
 
 export default function ProfilePage() {
-    const [authToken, setAuthToken] = useLocalStorage("authToken", "")
     const navigate = useNavigate();
+    const auth = getAuth();
+    const { currentUser } = useContext(AuthContext);
 
     useEffect(() => {
-        if (!authToken) {
-            navigate("/login");
+        if (!currentUser) {
+            navigate("/");
         }
-    }, [authToken, navigate])
+    }, [currentUser, navigate]);
 
-    const handleLogout = () => {
-        setAuthToken("");
-    }
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <>
             <Container>
@@ -27,5 +35,5 @@ export default function ProfilePage() {
                 </Row>
             </Container>
         </>
-    )
+    );
 }
